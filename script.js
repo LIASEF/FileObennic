@@ -16,10 +16,10 @@ document.getElementById("upload-form").addEventListener("submit", async function
     statusDiv.textContent = "Загрузка..."; // Получаем status меняем на загрузку
 
     try {
-        const response = await fetch("http://localhost:3000/upload", {
+        const response = await fetch("http://localhost:8080/upload", {
             method: "POST",
             body: formData
-        });// Отправляем на будущий сервер этот файл
+        });
 
         if (response.ok) {// Если запрос успешен то
             const result = await response.json();// Получаем ссылку на скачивание
