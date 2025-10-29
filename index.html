@@ -1,0 +1,21 @@
+<!--Пока создам тествую страницу hello world-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload Service</title>
+</head>
+<body>
+    <h1>Форма загрузки файла</h1>
+    <!--Форма загрузки дейсвие куда грузим post отправляем можем больший файлы ectype бинарку(файлы а не поля какие то текстовые)-->
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <label for="file">Выберите файл для загрузки:</label>
+        <!--Здесь поле где отображется вывбранный файл -->
+        <input type="file" id="file" name="file" required>
+        <button type="submit">Загрузить</button>
+    </form>
+    <div id="upload-status"></div>
+    <div id="download-link"></div>
+</body>
+</html>

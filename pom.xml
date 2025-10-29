@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <!-- Модель версии POM. Здесь определяется версия схемы POM, которая используется для этого проекта. -->
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Родительский POM для Spring Boot. Это стандартный родительский POM для всех проектов на основе Spring Boot -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.1.0</version> <!-- Версия Spring Boot -->
+        <relativePath/> <!-- Путь к родительскому POM (не используется в данном случае) -->
+    </parent>
+
+    <!-- Основные метаданные проекта -->
+    <groupId>com.example</groupId> <!-- Уникальный идентификатор проекта или компании -->
+    <artifactId>fileupload</artifactId> <!-- Имя артефакта (например, имя вашего jar файла) -->
+    <version>0.0.1-SNAPSHOT</version> <!-- Версия проекта, SNAPSHOT означает, что это нестабильная версия -->
+    <name>fileupload</name> <!-- Читаемое имя проекта -->
+    <description>File Upload Service</description> <!-- Описание проекта -->
+
+    <!-- Версия используемого Java -->
+    <properties>
+        <java.version>17</java.version> <!-- Указывает на используемую версию Java (здесь 17) -->
+    </properties>
+
+    <!-- Зависимости проекта -->
+    <dependencies>
+        <!-- Зависимость для Spring Boot Web (для создания веб-приложений) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId> <!-- Стартовый набор зависимостей для веб-приложений -->
+        </dependency>
+
+        <!-- Зависимость для тестирования в Spring Boot -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId> <!-- Стартовый набор зависимостей для тестов в Spring Boot -->
+            <scope>test</scope> <!-- Эта зависимость используется только в тестах -->
+        </dependency>
+    </dependencies>
+
+    <!-- Плагины для сборки и работы с Spring Boot -->
+    <build>
+        <plugins>
+            <!-- Плагин для Spring Boot, который позволяет запускать приложение с помощью Maven -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId> <!-- Плагин для упаковки и запуска Spring Boot приложений -->
+            </plugin>
+        </plugins>
+    </build>
+</project>
