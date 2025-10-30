@@ -1,0 +1,5 @@
+cd Backend/demo && mvn spring-boot:run
+
+start http://localhost:8080
+
+cd Backend/demo && mvn clean compile
