@@ -30,6 +30,10 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.time.Instant;// Инициалазиуция типа данных для сравнввания времени
+import java.time.LocalDateTime;// Для вывода даты // 2025-10-30T14:45:30
+import java.time.ZoneId;// для конветирования времени в нужном часом поясе
+import java.time.format.DateTimeFormatter;// позвляетм представить время как в Access "dd-MM-yyyy HH:mm"
+import java.nio.file.attribute.BasicFileAttributes; // Получить время создание и время посленго измения
 // Объявдяем контроллер для обратоки запросов от клиента
 @Controller
 @CrossOrigin("*")// А это чтобы клиент мог доступен для сервера с любомого порта
@@ -103,22 +107,32 @@ public class UploadController {
     @ResponseBody// Вернуть байты файла а не html страницу
     public ResponseEntity<List<FileInfo>> getFiles() {// возращаем тип список объектов fileinfo
         try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");// Шаблон для времени
             List<FileInfo> files = Files.list(Paths.get(UPLOAD_DIR))// Получаем все файлы с папки uploads
                 .filter(Files::isRegularFile)// Берем только файлы а не паки
                 .map(path -> {
-                    String fileName = path.getFileName().toString();
-                    // Извлекаем оригинальное имя файла (после UUID-)
-                    String originalName = fileName.substring(fileName.indexOf('-') + 1);
-                    String downloadUrl = "http://localhost:8080/download/" + fileName;// Формируем ссылку
-                    return new FileInfo(originalName, downloadUrl);// Создаем обхект fileinfo
+                    try {
+                        BasicFileAttributes attrs = Files.readAttributes(path, BasicFileAttributes.class);// Считывание базовых атрибутов файла
+                        String fileName = path.getFileName().toString();// плучаем имя файла
+                        // Извлекаем оригинальное имя файла (после UUID-)
+                        String originalName = fileName.substring(fileName.indexOf('-') + 1);
+                        String downloadUrl = "http://localhost:8080/download/" + fileName;// Формируем ссылку
+                        String creationDate = LocalDateTime.ofInstant(attrs.creationTime().toInstant(), ZoneId.systemDefault()).format(formatter);// Получаем время создания файла
+                        String uploadDate = LocalDateTime.ofInstant(attrs.lastModifiedTime().toInstant(), ZoneId.systemDefault()).format(formatter); // Получаем время загрузки
+                        String lastModifiedDate = LocalDateTime.ofInstant(attrs.lastModifiedTime().toInstant(), ZoneId.systemDefault()).format(formatter);// Получаем время последнего изменения
+                        return new FileInfo(originalName, downloadUrl, creationDate, uploadDate, lastModifiedDate);// Создаем объект для отправки на клиент
+                    } catch (IOException e) {
+                        return null;
+                    }
                 })
+                .filter(fileInfo -> fileInfo != null)
                 .collect(Collectors.toList());// Добавляем в список
             return ResponseEntity.ok(files);
         } catch (IOException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     } // метод вернет
-    // {"name":"report.pdf","downloadUrl":"http://localhost:8080/download/123e-report.pdf"} на клиент как пример
+    // {"name":"report.pdf","downloadUrl":"http://localhost:8080/download/123e-report.pdf"} на клиент как пример и еще он вернкт некоторую статистику файла
 
     // Класс для хранения URL для скачивания
     static class UploadResponse {
@@ -137,14 +151,20 @@ public class UploadController {
         }
     }
 
-    // Класс для информации о файле через него клиент получчает имя и ссылку 
+    // Класс для информации о файле через него клиент получчает имя и ссылку
     static class FileInfo {
         private String name;
         private String downloadUrl;
+        private String creationDate;
+        private String uploadDate;
+        private String lastModifiedDate;
 
-        public FileInfo(String name, String downloadUrl) {
+        public FileInfo(String name, String downloadUrl, String creationDate, String uploadDate, String lastModifiedDate) {
             this.name = name;
             this.downloadUrl = downloadUrl;
+            this.creationDate = creationDate;
+            this.uploadDate = uploadDate;
+            this.lastModifiedDate = lastModifiedDate;
         }
 
         public String getName() {
@@ -161,6 +181,30 @@ public class UploadController {
 
         public void setDownloadUrl(String downloadUrl) {
             this.downloadUrl = downloadUrl;
+        }
+
+        public String getCreationDate() {
+            return creationDate;
+        }
+
+        public void setCreationDate(String creationDate) {
+            this.creationDate = creationDate;
+        }
+
+        public String getUploadDate() {
+            return uploadDate;
+        }
+
+        public void setUploadDate(String uploadDate) {
+            this.uploadDate = uploadDate;
+        }
+
+        public String getLastModifiedDate() {
+            return lastModifiedDate;
+        }
+
+        public void setLastModifiedDate(String lastModifiedDate) {
+            this.lastModifiedDate = lastModifiedDate;
         }
     }
 }
