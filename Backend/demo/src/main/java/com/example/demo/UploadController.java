@@ -29,6 +29,7 @@ import java.util.UUID;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
+import java.time.Instant;// Инициалазиуция типа данных для сравнввания времени
 // Объявдяем контроллер для обратоки запросов от клиента
 @Controller
 @CrossOrigin("*")// А это чтобы клиент мог доступен для сервера с любомого порта
@@ -80,6 +81,9 @@ public class UploadController {
 
         if (Files.exists(path)) {
             try {
+                // Обновляем время последнего доступа
+                Files.setLastModifiedTime(path, java.nio.file.attribute.FileTime.from(Instant.now()));// Создаем file time с текущем временем изменения
+
                 byte[] fileContent = Files.readAllBytes(path);
                 // Извлекаем оригинальное имя файла (после UUID-)
                 String originalName = fileName.substring(fileName.indexOf('-') + 1);
