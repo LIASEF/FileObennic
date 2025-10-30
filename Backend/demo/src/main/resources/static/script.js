@@ -50,11 +50,11 @@ function displayFiles(files) {
     const container = document.querySelector('.container');// Берем контенйер по селектору
     let table = document.getElementById('files-table');// Cоздаем  переиеннуб для управления будущей табилцей
 
-    if (files.length > 0) {// если файлы есть 
+    if (files.length > 0) {// если файлы есть
         if (!table) {
             table = document.createElement('table');//Cоздаем таблицу
             table.id = 'files-table';// даем id созданной таблице
-            table.innerHTML = '<thead><tr><th>Имя файла</th><th>Ссылка для скачивания</th></tr></thead><tbody></tbody>';// Задаем столбцы
+            table.innerHTML = '<thead><tr><th>Имя файла</th><th>Дата создания</th><th>Дата загрузки</th><th>Дата изменения</th><th>Ссылка для скачивания</th></tr></thead><tbody></tbody>';// Задаем столбцы
             container.appendChild(table);// добавляем таблицу в контейнер
         }
 
@@ -65,6 +65,9 @@ function displayFiles(files) {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${file.name}</td>
+                <td>${file.creationDate}</td>
+                <td>${file.uploadDate}</td>
+                <td>${file.lastModifiedDate}</td>
                 <td><a href="${file.downloadUrl}" download="${file.name}">Скачать</a></td>
             `; // Вот здесь добавлен апостраф к ссылки и имени файла чтобы бразуер воспринимал ссылку как загрузочную
             tbody.appendChild(row);
