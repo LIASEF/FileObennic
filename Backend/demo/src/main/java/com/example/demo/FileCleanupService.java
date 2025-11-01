@@ -1,51 +1,42 @@
 package com.example.demo;
 
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
+import java.io.*;
+import java.nio.file.*;
+import java.nio.file.attribute.*;
+import java.time.*;
+import java.time.temporal.ChronoUnit;// Нужен считать разницу 
+import java.util.concurrent.*;// Что сделать задачу раз в 30 днкй -> планировщик
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.logging.Logger;
+public class FileCleanupService {// Класс содержит методы для удаления
+    private static final String UPLOAD_DIR = "uploads";// Имя папки сервера
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);// Инициализруем планировщик
 
-@Service// Чтобы в любым местах проекта вызывать класс как сервисный
-public class FileCleanupService {
+    public void start() {
+        scheduler.scheduleAtFixedRate(this::cleanupOldFiles, 0, 1, TimeUnit.DAYS);// Метод запуска планировщика
+    }
 
-    private static final Logger logger = Logger.getLogger(FileCleanupService.class.getName());// Вывод сообщений какие фмлы удалены были ошибки
-    private static final String UPLOAD_DIR = "uploads";// Путь к папке
-    private static final long DAYS_TO_KEEP = 30; // 30 дней
+    public void stop() {
+        scheduler.shutdown();// метод остановки планировщика
+    }
 
-    @Scheduled(fixedRate = 86400000) // Метод будет выполнять каждый 24 часа
-    public void cleanupOldFiles() {
+    private void cleanupOldFiles() {
         try {
-            Path uploadPath = Paths.get(UPLOAD_DIR);
-            if (!Files.exists(uploadPath)) {
-                return;
-            }// Если папки нет ничего не делаем 
-
-            Files.list(uploadPath)// Получаем все папк
-                .filter(Files::isRegularFile)// Работаем с файлами
-                .forEach(filePath -> {// Для каждого файла
+            Files.list(Paths.get(UPLOAD_DIR))// Берем файлы директории
+                .filter(Files::isRegularFile) // Фильтр
+                .forEach(path -> {// Для каждого файла
                     try {
-                        BasicFileAttributes attrs = Files.readAttributes(filePath, BasicFileAttributes.class);// Получаем базовые атрибуты время создание доступ пследний доступ
-                        Instant lastAccessTime = attrs.lastAccessTime().toInstant();// Берем последнее изменение и преобразуем его в Instant для Java удобный для времени
-                        Instant cutoff = Instant.now().minus(DAYS_TO_KEEP, ChronoUnit.DAYS);// Получаем время 30 дней назад 
-
-                        if (lastAccessTime.isBefore(cutoff)) {//если последний доступ был раньше чем 30 дней назад тоесть больше 30 дней то удаляем 
-                            Files.delete(filePath);
-                            logger.info("Удален устаревший файл: " + filePath.getFileName());
+                        BasicFileAttributes attrs = Files.readAttributes(path, BasicFileAttributes.class);// Получаем все данные
+                        Instant lastAccess = attrs.lastModifiedTime().toInstant();// Время последнего доступа
+                        if (lastAccess.isBefore(Instant.now().minus(30, ChronoUnit.DAYS))) {// Если больше 30 дней назад файл не открывался
+                            Files.delete(path); // Удаляем
+                            System.out.println("Deleted old file: " + path.getFileName());
                         }
                     } catch (IOException e) {
-                        logger.warning("Ошибка при обработке файла " + filePath.getFileName() + ": " + e.getMessage());
+                        System.err.println("Error processing file: " + path.getFileName());
                     }
                 });
         } catch (IOException e) {
-            logger.severe("Ошибка при очистке файлов: " + e.getMessage());
+            System.err.println("Error during cleanup: " + e.getMessage());
         }
     }
 }
