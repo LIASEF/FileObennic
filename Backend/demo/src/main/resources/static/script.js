@@ -10,13 +10,13 @@ document.getElementById("upload-form").addEventListener("submit", async function
     }
 
     const formData = new FormData();//Создаем объект который будет отправлять на сервер
-    formData.append("file", file);//Добавляем в этот объект "file" назвается файл file это сам файл
+    formData.append("file", file);//Добавляем в этот объект "file"  и передаетм сам file( file: имя файла)
 
     const statusDiv = document.getElementById("status");
     statusDiv.textContent = "Загрузка..."; // Получаем status меняем на загрузку
 
     try {
-        const response = await fetch("http://localhost:8080/upload", {
+        const response = await fetch("http://localhost:8000/upload", {
             method: "POST",
             body: formData
         });
@@ -35,7 +35,7 @@ document.getElementById("upload-form").addEventListener("submit", async function
 // Функция для загрузки и отображения списка файлов
 async function loadFiles() {
     try {
-        const response = await fetch("http://localhost:8080/files");
+        const response = await fetch("http://localhost:8000/files");
         if (response.ok) {
             const files = await response.json();//Получение  файлов для загрузки
             displayFiles(files);// Вывод файлов

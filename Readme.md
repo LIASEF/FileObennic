@@ -5,11 +5,11 @@
 
 Как пользоваться открыть cmd по пути проекта ввести команду 
 
-cd Backend/demo && mvn spring-boot:run 
+cd Backend/demo && mvn compile exec:java
 
 Сервер запуститься перейти по адрессу
 
-http://localhost:8080
+http://localhost:8000
 
 Пользоваться.
 

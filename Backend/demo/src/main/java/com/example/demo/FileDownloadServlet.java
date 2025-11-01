@@ -31,8 +31,9 @@ public class FileDownloadServlet extends HttpServlet {
 
         try (InputStream input = Files.newInputStream(filePath);// Потомк для чтеная файла
              OutputStream output = response.getOutputStream()) {// Поток для отправки файла клиенту от сервера
-            byte[] buffer = new byte[8192];// Буфер для перенеса файла с сервера 
-            while ((bytesRead = input.read(buffer)) != -1) {// Пененосим в буфер 
+            byte[] buffer = new byte[8192];// Буфер для перенеса файла с сервера
+            int bytesRead;
+            while ((bytesRead = input.read(buffer)) != -1) {// Пененосим в буфер
                 output.write(buffer, 0, bytesRead);// Отправляем файл с сервера
             }
         }
